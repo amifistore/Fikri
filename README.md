@@ -6,7 +6,7 @@
 
 Bot Telegram ini dirancang untuk mengelola penjualan produk kuota Akrab XL/Axis. Bot ini memiliki struktur modular, panel admin, dan fitur menu keyboard dinamis yang menampilkan stok produk secara real-time.
 
-Repositori ini dapat diakses di: [https://github.com/amifistore/Fikri](https://github.com/amifistore/Fikri)
+Repositori ini dapat diakses di: https://github.com/amifistore/Fikri](https://github.com/amifistore/Fikri)
 
 ---
 ## ✨ Fitur Utama
