@@ -37,7 +37,7 @@ from handlers.admin import (
 from handlers.history import riwayat_user, semua_riwayat_admin
 
 
-def callback_router(update: Update, context: CallbackContext):
+def callback_router(update, context):
     query = update.callback_query
     query.answer()
     data = query.data
@@ -65,21 +65,29 @@ def callback_router(update: Update, context: CallbackContext):
         'admin_generate_kode': admin_generate_kode,
     }
 
-    if data.startswith("topup_upload|"): return topup_upload_router(update, context)
-    if data.startswith("admin_cekuser_detail|"): return admin_cekuser_detail_callback(update, context)
-    if data.startswith("admin_topup_detail|"): return admin_topup_detail(update, context)
-    if data.startswith("admin_topup_action|"): return admin_topup_action(update, context)
+    if data.startswith("topup_upload|"): 
+        return topup_upload_router(update, context)
+    if data.startswith("admin_cekuser_detail|"): 
+        return admin_cekuser_detail_callback(update, context)
+    if data.startswith("admin_topup_detail|"): 
+        return admin_topup_detail(update, context)
+    if data.startswith("admin_topup_action|"): 
+        return admin_topup_action(update, context)
     
     if data in route_map:
         return route_map[data](update, context)
         
     return ConversationHandler.END
 
+
 def main():
     db.init_db()
     logger.info("Memuat cache produk awal...")
     update_produk_cache_background()
+    
+    # Gunakan Updater untuk versi 13.7
     updater = Updater(TOKEN, use_context=True)
+    dispatcher = updater.dispatcher
     
     flask_thread = threading.Thread(target=run_flask_app, args=(updater,))
     flask_thread.daemon = True
@@ -94,10 +102,11 @@ def main():
     static_button_regex = r'^(Topup Saldo|Cek Saldo|Cek Area|Unreg Mandiri|All Bekasan|Cek Dompul|Cek Stock Fresh|Cek Stock Bekasan)$'
 
     # Menambahkan handler untuk tombol ReplyKeyboard
-    updater.dispatcher.add_handler(MessageHandler(Filters.text & Filters.regex(product_button_regex), handle_product_button))
-    updater.dispatcher.add_handler(MessageHandler(Filters.text & Filters.regex(r'^Topup Saldo$'), handle_topup_button))
-    updater.dispatcher.add_handler(MessageHandler(Filters.text & Filters.regex(static_button_regex), handle_unhandled_buttons))
+    dispatcher.add_handler(MessageHandler(Filters.text & Filters.regex(product_button_regex), handle_product_button))
+    dispatcher.add_handler(MessageHandler(Filters.text & Filters.regex(r'^Topup Saldo$'), handle_topup_button))
+    dispatcher.add_handler(MessageHandler(Filters.text & Filters.regex(static_button_regex), handle_unhandled_buttons))
     
+    # Conversation handler
     conv_handler = ConversationHandler(
         entry_points=[
             CommandHandler('start', start),
@@ -127,12 +136,14 @@ def main():
         ],
         allow_reentry=True
     )
-    updater.dispatcher.add_handler(conv_handler)
-    updater.dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_text))
+    
+    dispatcher.add_handler(conv_handler)
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_text))
     
     logger.info("Bot started...")
     updater.start_polling()
     updater.idle()
+
 
 if __name__ == "__main__":
     main()
