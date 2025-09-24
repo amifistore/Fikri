@@ -37,3 +37,12 @@ Pindahkan repositori ini ke server Anda menggunakan Git.
 ```bash
 git clone [https://github.com/amifistore/Fikri.git](https://github.com/amifistore/Fikri.git)
 cd Fikri
+# Buat dan aktifkan venv
+python3 -m venv venv
+source venv/bin/activate
+
+# Buat file requirements.txt
+nano requirements.txt
+
+# Instal semua dependensi
+pip install -r requirements.txt
